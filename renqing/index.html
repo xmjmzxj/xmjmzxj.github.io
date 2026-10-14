@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14110f">
+<title>人情世故段位测试 · 3 分钟测出你在人际场上的段位</title>
+<meta name="description" content="25 道真实社交场景，测出你在人情场上的段位——从「初入江湖」到「无招胜有招」。3 分钟出结果，附五维画像与提升建议。">
+<meta name="keywords" content="人情世故,段位测试,性格测试,社交能力测试,情商测试,人情世故段位">
+<meta property="og:title" content="人情世故段位测试 · 你在人际场上是几段？">
+<meta property="og:description" content="25 道真实社交场景，3 分钟测出你的人际段位。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🀄</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ 封面 ============ -->
+  <section id="view-cover" class="view is-active">
+    <div class="cover-bg" aria-hidden="true"></div>
+
+    <div class="cover-inner">
+      <div class="brand-row">
+        <span class="brand-dot"></span>
+        <span class="brand-text" id="brandName">人情世故段位</span>
+      </div>
+
+      <h1 class="cover-title">
+        你在人情场上<br><em>是几段？</em>
+      </h1>
+
+      <p class="cover-sub">
+        25 个真实社交场景，从饭局到群里，<br>
+        看清你读懂人心的能力，到底在什么位置。
+      </p>
+
+      <div class="cover-stats">
+        <div class="stat">
+          <b id="statUsers">—</b>
+          <span>已测人数</span>
+        </div>
+        <div class="stat-line"></div>
+        <div class="stat">
+          <b>25</b>
+          <span>道场景题</span>
+        </div>
+        <div class="stat-line"></div>
+        <div class="stat">
+          <b>3</b>
+          <span>分钟出结果</span>
+        </div>
+      </div>
+
+      <!-- 密码区（config.requirePassword 为 false 时自动隐藏） -->
+      <div class="pass-box" id="passBox" hidden>
+        <label class="pass-label" for="passInput">输入测试密码</label>
+        <div class="pass-row">
+          <input id="passInput" type="text" inputmode="text" autocomplete="off"
+                 placeholder="例如 RQ-8F3K2A" maxlength="20">
+          <button id="passBtn" class="btn btn-ghost" type="button">验证</button>
+        </div>
+        <p class="pass-hint" id="passHint">密码由发放渠道提供，一码一次</p>
+      </div>
+
+      <button id="startBtn" class="btn btn-primary btn-lg" type="button">
+        开始测试 <span class="arrow">→</span>
+      </button>
+
+      <p class="cover-note">
+        <span id="coverNoteText">无需注册 · 结果本地生成 · 秒出海报</span>
+      </p>
+    </div>
+
+    <div class="cover-foot">
+      <p id="coverDisclaimer"></p>
+    </div>
+  </section>
+
+  <!-- ============ 答题 ============ -->
+  <section id="view-quiz" class="view">
+    <header class="quiz-head">
+      <button id="backBtn" class="icon-btn" type="button" aria-label="上一题">←</button>
+      <div class="progress-wrap">
+        <div class="progress-bar"><i id="progressFill"></i></div>
+      </div>
+      <div class="quiz-count"><b id="curNo">1</b><span>/25</span></div>
+    </header>
+
+    <div class="quiz-body">
+      <p class="quiz-kicker" id="quizDim">场景 · 察言观色</p>
+      <h2 class="quiz-title" id="quizText">题目加载中…</h2>
+      <div class="opt-list" id="optList"></div>
+    </div>
+
+    <footer class="quiz-foot">
+      <span class="quiz-tip">凭第一直觉选择，不用反复斟酌</span>
+    </footer>
+  </section>
+
+  <!-- ============ 计算中 ============ -->
+  <section id="view-loading" class="view view-center">
+    <div class="loading-wrap">
+      <div class="loading-ring"><span></span><span></span><span></span></div>
+      <h3 class="loading-title" id="loadingText">正在解析你的人情底色…</h3>
+      <p class="loading-sub">比对常模数据，生成专属画像</p>
+    </div>
+  </section>
+
+  <!-- ============ 结果 ============ -->
+  <section id="view-result" class="view">
+    <div class="result-head" id="resultHead">
+      <div class="rank-emoji" id="rankEmoji">🎴</div>
+      <div class="rank-code" id="rankCode">初入江湖</div>
+      <h2 class="rank-name" id="rankName">人情小白</h2>
+      <p class="rank-tag" id="rankTag"></p>
+      <div class="beat-badge">
+        你击败了 <b id="beatPct">—</b> 的测试者
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><span class="tick"></span>你的段位画像</h3>
+      <p class="rank-desc" id="rankDesc"></p>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><span class="tick"></span>五维能力分布</h3>
+      <div class="dim-list" id="dimList"></div>
+      <div class="dim-summary" id="dimSummary"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><span class="tick"></span>你的天然优势</h3>
+      <ul class="point-list good" id="strengthList"></ul>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><span class="tick"></span>往上再走一步</h3>
+      <ul class="point-list tip" id="adviceList"></ul>
+    </div>
+
+    <blockquote class="quote-block" id="quoteBlock"></blockquote>
+
+    <div class="result-actions">
+      <button id="posterBtn" class="btn btn-primary btn-lg" type="button">
+        生成段位海报
+      </button>
+      <button id="shareBtn" class="btn btn-ghost btn-lg" type="button">
+        分享给朋友
+      </button>
+      <button id="againBtn" class="btn btn-text" type="button">重新测一次</button>
+    </div>
+
+    <p class="result-foot" id="resultFoot"></p>
+  </section>
+
+  <!-- ============ 海报弹层 ============ -->
+  <div id="posterModal" class="modal" hidden>
+    <div class="modal-mask" id="modalMask"></div>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <span>长按图片也可保存</span>
+        <button id="modalClose" class="icon-btn" type="button" aria-label="关闭">✕</button>
+      </div>
+      <div class="poster-scroll">
+        <img id="posterImg" alt="段位海报">
+      </div>
+      <div class="modal-foot">
+        <button id="saveImgBtn" class="btn btn-primary btn-lg" type="button">保存到相册</button>
+      </div>
+      <p class="modal-tip" id="modalTip"></p>
+    </div>
+  </div>
+
+  <!-- 全局提示 -->
+  <div id="toast" class="toast" hidden></div>
+
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/questions.js"></script>
+<script src="js/results.js"></script>
+<script src="js/poster.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
