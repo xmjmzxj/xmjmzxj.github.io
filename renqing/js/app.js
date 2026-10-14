@@ -63,14 +63,57 @@
     } catch (e) { local = 0; }
     $('statUsers').textContent = (base + local).toLocaleString('zh-CN');
 
-    /* 密码区 */
+    /* 支付区 / 密码区（支付优先） */
     if (APP_CONFIG.isFreeMode()) {
+      $('payBox').hidden = true;
       $('passBox').hidden = true;
-      $('coverNoteText').textContent = '无需密码 · 结果本地生成 · 秒出海报';
+      $('coverNoteText').textContent = '结果本地生成 · 秒出海报';
       state.verified = true;
-    } else {
+      state.paid = true;
+    } else if (APP_CONFIG.requirePayment && APP_CONFIG.payment) {
+      var pay = APP_CONFIG.payment;
+      $('passBox').hidden = true;
+      $('payBox').hidden = false;
+      $('payPrice').textContent = pay.price;
+      $('payPrice2').textContent = pay.price;
+      $('payQrImg').src = pay.qrImage;
+      $('coverNoteText').textContent = '支付一次 · 永久可测 · 秒出海报';
+      restorePaid();
+    } else if (APP_CONFIG.requirePassword) {
+      $('payBox').hidden = true;
       $('passBox').hidden = false;
     }
+  }
+
+  /* ============ 支付解锁 ============ */
+  function restorePaid() {
+    try {
+      if (sessionStorage.getItem(APP_CONFIG.payment.sessionKey) === '1') markPaid(false);
+    } catch (e) { /* ignore */ }
+  }
+
+  function markPaid(showTip) {
+    state.paid = true;
+    var btn = $('paidBtn');
+    btn.classList.add('is-done');
+    btn.textContent = '已解锁 ✓';
+    var hint = $('payHint');
+    hint.classList.remove('err');
+    hint.classList.add('ok');
+    hint.textContent = '解锁成功，点击下方「开始测试」';
+    try {
+      sessionStorage.setItem(APP_CONFIG.payment.sessionKey, '1');
+    } catch (e) { /* ignore */ }
+    if (showTip) toast('支付确认完成，测试已解锁');
+  }
+
+  function bindPay() {
+    $('paidBtn').addEventListener('click', function () {
+      if (state.paid) return;
+      /* 纯静态站无法验证到账，由用户自确认；
+         接入微信支付回调 / Supabase 订单表后可改为自动核销 */
+      markPaid(true);
+    });
   }
 
   /* ============ 密码校验 ============ */
@@ -486,7 +529,18 @@
   /* ============ 开始 ============ */
   function bindStart() {
     $('startBtn').addEventListener('click', function () {
-      if (APP_CONFIG.requirePassword && !state.verified) {
+      if (APP_CONFIG.isFreeMode()) {
+        /* 免密直通 */
+      } else if (APP_CONFIG.requirePayment) {
+        if (!state.paid) {
+          var pbox = $('payBox');
+          pbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          var ph = $('payHint');
+          ph.classList.add('err');
+          ph.textContent = '请先扫码支付 ' + APP_CONFIG.payment.price + ' 元，再点击「我已支付」';
+          return;
+        }
+      } else if (APP_CONFIG.requirePassword && !state.verified) {
         var box = $('passBox');
         box.scrollIntoView({ behavior: 'smooth', block: 'center' });
         $('passHint').classList.add('err');
@@ -504,6 +558,7 @@
   /* ============ 启动 ============ */
   function boot() {
     initCover();
+    bindPay();
     bindPass();
     bindStart();
     bindBack();
