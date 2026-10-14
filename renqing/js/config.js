@@ -13,7 +13,20 @@ var APP_CONFIG = {
   /* 是否要求输入测试密码才能开始答题
      true  = 开店模式，买家需输入密码
      false = 免费推广模式，谁都能测 */
-  requirePassword: true,
+  requirePassword: false,
+
+  /* ---------- 付费模式：扫码支付后解锁测试 ----------
+     打开 requirePayment 后，封面显示收款码，
+     用户长按识别支付后点「我已支付」解锁。
+     优先级高于 requirePassword（两者都开时只走支付）。 */
+  requirePayment: true,
+
+  payment: {
+    price: '0.99',                    // 展示价格（元）
+    qrImage: 'assets/wxskm.jpg',      // 收款码图片路径
+    payChannel: '微信支付',            // 提示文案用
+    sessionKey: 'rqdw_paid_session'   // 本会话已支付标记（关闭页面后需重新验证）
+  },
 
   /* 自己验收用：网址后面加 ?free=1 可临时跳过密码（不写死进代码） */
   freeParam: 'free',
@@ -22,7 +35,7 @@ var APP_CONFIG = {
   adminKey: 'rqdw@2026',
 
   /* 社交证明展示的数字（可写死，也可以留空自动用本地计数） */
-  baseUserCount: 128460,
+  baseUserCount: 11460,
 
   /* ---------- 可选：接入 Supabase 做云端密码校验 + 数据统计 ----------
      纯静态模式下密码池放在 data/passwords.json，所有人共用。
@@ -46,9 +59,9 @@ var APP_CONFIG = {
   disclaimer: '本测评结果基于情境选项生成，仅供自我觉察与娱乐参考，不构成任何专业心理诊断。'
 };
 
-/* 是否处于「免费直通」状态 */
+/* 是否处于「免费直通」状态（密码与支付都未开启，或显式 ?free=1） */
 APP_CONFIG.isFreeMode = function () {
-  if (!APP_CONFIG.requirePassword) return true;
+  if (!APP_CONFIG.requirePassword && !APP_CONFIG.requirePayment) return true;
   try {
     var q = new URLSearchParams(location.search);
     return q.get(APP_CONFIG.freeParam) === '1';
