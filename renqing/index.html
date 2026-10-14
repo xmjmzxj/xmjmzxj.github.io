@@ -53,7 +53,27 @@
         </div>
       </div>
 
-      <!-- 密码区（config.requirePassword 为 false 时自动隐藏） -->
+      <!-- 支付区（config.requirePayment 为 true 且非免密模式时显示） -->
+      <div class="pay-box" id="payBox" hidden>
+        <div class="pay-head">
+          <span class="pay-price"><i>¥</i><b id="payPrice">0.99</b></span>
+          <span class="pay-label">扫码支付 · 解锁完整测试</span>
+        </div>
+        <div class="qr-wrap">
+          <img id="payQrImg" src="" alt="收款二维码" draggable="false">
+        </div>
+        <ol class="pay-steps">
+          <li>长按上方二维码</li>
+          <li>选择「识别图中二维码」</li>
+          <li>支付 <b id="payPrice2">0.99</b> 元后回到本页</li>
+        </ol>
+        <button id="paidBtn" class="btn btn-ghost btn-paid" type="button">
+          我已支付，解锁测试
+        </button>
+        <p class="pay-hint" id="payHint">支付完成后点击上方按钮即可开始</p>
+      </div>
+
+      <!-- 密码区（config.requirePassword 为 true 且支付未开时显示） -->
       <div class="pass-box" id="passBox" hidden>
         <label class="pass-label" for="passInput">输入测试密码</label>
         <div class="pass-row">
