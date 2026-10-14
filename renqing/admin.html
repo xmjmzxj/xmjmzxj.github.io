@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>后台管理 · 人情世故段位</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .admin { max-width: 780px; margin: 0 auto; padding: 26px 18px 60px; }
+  .admin-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 12px; }
+  .admin-head h1 { font-family: var(--serif); font-size: 23px; margin: 0; letter-spacing: 1px; }
+  .admin-head h1 small { display: block; font-family: var(--sans); font-size: 11.5px; color: var(--muted); letter-spacing: 2px; font-weight: 400; margin-top: 4px; }
+
+  .login-card { max-width: 380px; margin: 12vh auto 0; padding: 26px 22px; background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--r-lg); }
+  .login-card h2 { font-size: 17px; margin: 0 0 6px; }
+  .login-card p { font-size: 13px; color: var(--muted); margin: 0 0 18px; }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12.5px; color: var(--gold); letter-spacing: 1px; margin-bottom: 7px; font-weight: 600; }
+  .field input, .field select {
+    width: 100%; background: rgba(0,0,0,.28); border: 1px solid var(--line); color: var(--text);
+    font-family: inherit; font-size: 15px; padding: 11px 14px; border-radius: 10px; outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--gold-dim); }
+  .field-row { display: flex; gap: 12px; }
+  .field-row .field { flex: 1; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .tab {
+    padding: 9px 18px; border-radius: 999px; border: 1px solid var(--line);
+    background: rgba(243,236,223,.04); color: var(--text-2); font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .tab.on { background: rgba(217,164,65,.16); border-color: var(--gold); color: var(--gold-2); font-weight: 600; }
+
+  .panel { background: var(--ink-2); border: 1px solid var(--line-soft); border-radius: var(--r-lg); padding: 20px; margin-bottom: 16px; }
+  .panel h3 { font-size: 15px; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+  .panel h3::before { content: ""; width: 3px; height: 14px; background: var(--gold); border-radius: 2px; }
+
+  .code-box {
+    background: #0d0b09; border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px; font-family: ui-monospace, Consolas, monospace; font-size: 13.5px;
+    color: var(--gold-2); max-height: 320px; overflow: auto; white-space: pre-wrap;
+    line-height: 1.9; letter-spacing: .5px; word-break: break-all;
+  }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .btn-sm { padding: 10px 18px; font-size: 14px; }
+
+  .kpi-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+  .kpi { flex: 1 1 130px; background: rgba(217,164,65,.07); border: 1px solid var(--line-soft); border-radius: 14px; padding: 14px; text-align: center; }
+  .kpi b { display: block; font-family: var(--serif); font-size: 27px; color: var(--gold-2); }
+  .kpi span { font-size: 12px; color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line-soft); }
+  th { color: var(--muted); font-weight: 500; font-size: 12.5px; }
+  td { color: var(--text-2); }
+
+  .notice { font-size: 12.5px; line-height: 1.75; color: var(--muted); background: rgba(217,164,65,.06); border-left: 3px solid var(--gold-dim); padding: 12px 14px; border-radius: 0 10px 10px 0; margin-bottom: 16px; }
+  .notice b { color: var(--gold-2); }
+  .err { color: var(--red-2); font-size: 13px; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="admin">
+
+  <!-- 登录 -->
+  <div id="loginCard" class="login-card">
+    <h2>后台管理</h2>
+    <p>人情世故段位 · 运营后台</p>
+    <div class="field">
+      <label for="keyInput">管理密钥</label>
+      <input id="keyInput" type="password" placeholder="请输入管理密钥" autocomplete="off">
+    </div>
+    <button id="loginBtn" class="btn btn-primary btn-lg" type="button">进入后台</button>
+    <p id="loginErr" class="err" hidden></p>
+  </div>
+
+  <!-- 面板 -->
+  <div id="panel" hidden>
+    <div class="admin-head">
+      <h1>运营后台<small>REN QING SHI GU · ADMIN</small></h1>
+      <button id="logoutBtn" class="icon-btn" type="button" title="退出">⎋</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" data-tab="pass" type="button">密码管理</button>
+      <button class="tab" data-tab="data" type="button">数据统计</button>
+      <button class="tab" data-tab="help" type="button">部署说明</button>
+    </div>
+
+    <!-- 密码管理 -->
+    <section id="tab-pass">
+      <div class="notice">
+        <b>纯静态模式的说明：</b>当前站点部署在 GitHub Pages，没有服务器，密码池存在
+        <code>data/passwords.json</code> 里，所有买家共用同一份。<br>
+        流程是：在这里生成一批 → 下载 JSON → 覆盖项目里的 <code>data/passwords.json</code> → 提交更新。
+        想要「一码一用、后台看真实数据」，请到「部署说明」里按三步接入 Supabase（免费）。
+      </div>
+
+      <div class="panel">
+        <h3>批量生成密码</h3>
+        <div class="field-row">
+          <div class="field">
+            <label for="genCount">生成数量</label>
+            <input id="genCount" type="number" value="50" min="1" max="2000">
+          </div>
+          <div class="field">
+            <label for="genPrefix">前缀</label>
+            <input id="genPrefix" type="text" value="RQ-" maxlength="6">
+          </div>
+          <div class="field">
+            <label for="genLen">随机位数</label>
+            <input id="genLen" type="number" value="6" min="4" max="12">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button id="genBtn" class="btn btn-primary btn-sm" type="button">生成</button>
+          <button id="mergeBtn" class="btn btn-ghost btn-sm" type="button">追加到现有密码池</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>密码清单</h3>
+        <div class="kpi-row">
+          <div class="kpi"><b id="kpiTotal">0</b><span>密码总数</span></div>
+          <div class="kpi"><b id="kpiUsed">0</b><span>本机已用</span></div>
+          <div class="kpi"><b id="kpiLeft">0</b><span>剩余可用</span></div>
+        </div>
+        <div class="btn-row" style="margin-bottom:12px">
+          <button id="loadPoolBtn" class="btn btn-ghost btn-sm" type="button">读取线上密码池</button>
+          <button id="copyJsonBtn" class="btn btn-ghost btn-sm" type="button">复制 JSON</button>
+          <button id="dlJsonBtn" class="btn btn-ghost btn-sm" type="button">下载 passwords.json</button>
+          <button id="dlCsvBtn" class="btn btn-ghost btn-sm" type="button">导出 CSV</button>
+        </div>
+        <div id="codeBox" class="code-box">尚未生成或读取密码</div>
+      </div>
+    </section>
+
+    <!-- 数据统计 -->
+    <section id="tab-data" hidden>
+      <div class="notice" id="dataNotice"></div>
+      <div class="panel">
+        <h3>总体数据</h3>
+        <div class="kpi-row">
+          <div class="kpi"><b id="dTotal">0</b><span>完成测试</span></div>
+          <div class="kpi"><b id="dAvg">—</b><span>平均分</span></div>
+          <div class="kpi"><b id="dTop">—</b><span>最多段位</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>段位分布</h3>
+        <table>
+          <thead><tr><th>段位</th><th>人数</th><th>占比</th><th>维度趋势</th></tr></thead>
+          <tbody id="distBody"><tr><td colspan="4" style="color:var(--muted)">暂无数据</td></tr></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h3>最近记录</h3>
+        <table>
+          <thead><tr><th>时间</th><th>总分</th><th>段位</th><th>察言</th><th>分寸</th><th>人情</th><th>话术</th><th>自控</th></tr></thead>
+          <tbody id="recentBody"><tr><td colspan="8" style="color:var(--muted)">暂无数据</td></tr></tbody>
+        </table>
+        <div class="btn-row">
+          <button id="exportDataBtn" class="btn btn-ghost btn-sm" type="button">导出全部记录 CSV</button>
+          <button id="clearDataBtn" class="btn btn-ghost btn-sm" type="button">清空本机记录</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 说明 -->
+    <section id="tab-help" hidden>
+      <div class="panel">
+        <h3>上线三步</h3>
+        <p style="color:var(--text-2);font-size:14px;line-height:1.9;margin:0">
+          1. 把整个 <code>renqing-test</code> 目录推到 GitHub 仓库，Settings → Pages 选 main 分支根目录。<br>
+          2. 打开 <code>js/config.js</code>，把 <code>siteUrl</code> 改成你的真实网址（海报上的二维码靠它）。<br>
+          3. 改掉 <code>adminKey</code>，生成密码池覆盖 <code>data/passwords.json</code>，完成。
+        </p>
+      </div>
+      <div class="panel">
+        <h3>接入 Supabase（一码一用 + 真实数据）</h3>
+        <div class="code-box">-- 在 Supabase 的 SQL Editor 里执行
+create table rqdw_passwords (
+  code   text primary key,
+  used   boolean default false,
+  used_at timestamptz,
+  note   text
+);
+
+create table rqdw_results (
+  id     bigserial primary key,
+  ts     timestamptz default now(),
+  total  int,
+  rank   text,
+  dims   jsonb,
+  code   text
+);
+
+alter table rqdw_passwords enable row level security;
+alter table rqdw_results   enable row level security;
+
+-- 允许匿名读密码（校验用）、匿名写结果
+create policy "read pass" on rqdw_passwords for select using (true);
+create policy "insert result" on rqdw_results for insert with check (true);
+create policy "read result" on rqdw_results for select using (true);</div>
+        <p style="color:var(--muted);font-size:13px;line-height:1.8;margin:14px 0 0">
+          执行完把 Project URL 和 anon public key 填进 <code>js/config.js</code> 的 <code>supabase</code> 字段即可。
+        </p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/questions.js"></script>
+<script src="js/results.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
